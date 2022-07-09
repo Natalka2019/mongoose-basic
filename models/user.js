@@ -5,14 +5,14 @@ const Article = require('./article');
 const ProductSchema = new Schema({
   firstName: {
     type: String,
-    minLength: [4, 'Name is too short'],
-    maxLength: [50, 'Name is to long'],
+    minlength: [4, 'Name is too short'],
+    maxlength: [50, 'Name is to long'],
     required: [true, 'This field is required']
   },
   lastName: {
     type: String,
-    minLength: [3, 'Name is too short'],
-    maxLength: [60, 'Name is to long'],
+    minlength: [3, 'Name is too short'],
+    maxlength: [60, 'Name is to long'],
     required: [true, 'This field is required']
   },
   role: {

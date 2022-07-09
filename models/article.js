@@ -5,18 +5,18 @@ const ProductSchema = new Schema(
   {
     title: {
       type: String,
-      minLength: [5, 'Title is too short'],
-      maxLength: [400, 'Title is to long'],
+      minlength: [5, 'Title is too short'],
+      maxlength: [400, 'Title is to long'],
       required: [true, 'This field is required']
     },
     subtitle: {
       type: String,
-      minLength: [5, 'Subtitle is too short']
+      minlength: [5, 'Subtitle is too short']
     },
     description: {
       type: String,
-      minLength: [5, 'Description is too short'],
-      maxLength: [5000, 'Description is to long'],
+      minlength: [5, 'Description is too short'],
+      maxlength: [5000, 'Description is to long'],
       required: [true, 'This field is required']
     },
     owner: {
