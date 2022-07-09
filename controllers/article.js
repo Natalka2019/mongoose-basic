@@ -45,16 +45,10 @@ async function updateArticle(req, res, next) {
       useFindAndModify: false
     });
 
-    if (!existingArticle) {
-      throw errorHelper.badRequest('Article does not exists');
-      //return res.status(404).send();
-      //return next(errorHelper.badRequest('User does not exist'));
-    }
-
     res.status(201).json(existingArticle);
   } catch (err) {
     console.log(err);
-    //res.status(400).send(err);
+
     next(err);
   }
 }
@@ -65,13 +59,17 @@ async function deleteArticle(req, res, next) {
   try {
     await Article.findOneAndDelete({_id: articleId});
 
-    const owner = await User.findById(req.body.owner);
+    const owner = await User.findById(req.article.owner);
+
+    if (!owner) {
+      return next(errorHelper.badRequest('There is no owner with such id'));
+    }
 
     owner.numberOfArticles -= 1;
 
     await owner.save();
 
-    return res.status(200).json({});
+    return res.status(200).json('Article was successfully deleted');
   } catch (err) {
     console.log(err);
     next(err);
@@ -81,20 +79,33 @@ async function deleteArticle(req, res, next) {
 async function getArticles(req, res, next) {
   try {
     const {
-      query: {skip = 0, limit = 10, search = '', sort: sortFromClient}
+      query: {
+        skip = 0,
+        limit = 10,
+        search = '',
+        sort: sortFromClient,
+        owner,
+        category,
+        createdAt,
+        updatedAt
+      }
     } = req;
+
     const sort = util.sort(sortFromClient);
     const filter = {$regex: new RegExp(util.escapeRegExpChars(search), 'i')};
+
     const query = {
-      $or: [
-        {title: filter},
-        {description: filter},
-        {owner: filter},
-        {category: filter},
-        {createdAt: filter},
-        {updatedAt: filter}
+      $and: [
+        {
+          $or: [{title: filter}, {subtitle: filter}, {description: filter}]
+        },
+        category ? {category} : {},
+        owner ? {owner} : {},
+        createdAt ? {createdAt} : {},
+        updatedAt ? {updatedAt} : {}
       ]
     };
+
     const result = await Article.find(query).populate('owner').sort(sort).skip(skip).limit(limit);
 
     res.status(201).json(result);
